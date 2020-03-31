@@ -1,0 +1,228 @@
+﻿@model ForecastModel
+@{
+    ViewData["Title"] = "Weekly Data";
+}
+@{List<WeekSummary> selectedSummary = Model.MildForecast.WeekCalculations;
+    switch (Model.SelectedForecast)
+    {
+        case "Sample Mitigation":
+            selectedSummary = Model.MildForecast.WeekCalculations;
+            break;
+        case "Moderate Social Distancing":
+            selectedSummary = Model.ModerateForecast.WeekCalculations;
+            break;
+        case "Mild Social Distancing":
+            selectedSummary = Model.Aggressive80Forecast.WeekCalculations;
+            break;
+        case "Early Pandemic":
+            selectedSummary = Model.Aggressive90Forecast.WeekCalculations;
+            break;
+    }
+}
+
+@{
+    string xValues = JsonConvert.SerializeObject(selectedSummary.Select(x => x.Number).ToList());
+
+    string infectedValues = JsonConvert.SerializeObject(selectedSummary.Select(x => (int)x.InfectedCount).ToList());
+    string nonICUADCValues = JsonConvert.SerializeObject(selectedSummary.Select(x => (int)x.UserOrgNonICUADC).ToList());
+    string icuADCValues = JsonConvert.SerializeObject(selectedSummary.Select(x => (int)x.UserOrgICUADC).ToList());
+    string ventADCValues = JsonConvert.SerializeObject(selectedSummary.Select(x => (int)x.UserOrgVentADC).ToList());
+
+    string nonICUSurplusValues = JsonConvert.SerializeObject(selectedSummary.Select(x => (int)x.UserOrgNonICUBedSurplus).ToList());
+    string icuSurplusValues = JsonConvert.SerializeObject(selectedSummary.Select(x => (int)x.UserOrgICUBedSurplus).ToList());
+    string ventSurplusValues = JsonConvert.SerializeObject(selectedSummary.Select(x => (int)x.UserOrgVentSurplus).ToList());
+}
+
+@using (Html.BeginForm("WeeklyData", "Home", FormMethod.Post))
+{
+    @Html.DropDownListFor(m => m.SelectedForecast,
+                          new SelectList(Model.ForecastNames),
+                          null,
+                          new { @id = "ModelSelection", @class = "form-control", onchange = "this.form.submit();" })
+
+    <div style="height:500px">
+        <div style="width: 49%; height: 500px; float: left">
+            <canvas id="adcChart" style="width:49%; height:500px;"></canvas>
+        </div>
+        <div style="width: 49%; height: 500px; float: left;">
+            <canvas id="shortageChart" style="width:49%; height:500px;"></canvas>
+        </div>
+    </div>
+
+    <div class="grid-header">
+        <span>Weekly Forecast</span>
+        <div class="grid-header-buttons">
+            <a class="fa fa-file fa-file-excel-o grid-header-buttons" href="@(Url.Action("WeeklyDataExport") + ViewContext.HttpContext.Request.QueryString)"></a>
+        </div>
+    </div>
+    @(new HtmlGrid<IForecastReport>(Html, Model.GridData))
+}
+
+@section Scripts
+{
+    <script type="text/javascript">
+        function buildADCChart() {
+            var chartName = "adcChart";
+            var canvas = document.getElementById(chartName).getContext('2d');
+            var data = {
+                labels: @Html.Raw(xValues),
+                datasets: [
+                    {
+                        label: "Infected Count",
+                        data: @Html.Raw(infectedValues),
+                        yAxisID: "Infections",
+                        fill: false
+                    },
+                    {
+                        label: "Non-ICU ADC",
+                        data: @Html.Raw(nonICUADCValues),
+                        yAxisID: "ADCs",
+                        fill: false
+                    },
+                    {
+                        label: "ICU ADC",
+                        data: @Html.Raw(icuADCValues),
+                        yAxisID: "ADCs",
+                        fill: false
+                    },
+                    {
+                        label: "Ventilator ADC",
+                        data: @Html.Raw(ventADCValues),
+                        yAxisID: "ADCs",
+                        fill: false
+                    }
+                ]
+            };
+            var options = {
+                maintainAspectRatio: false,
+                scales: {
+                    yAxes: [
+                        {
+                            id: "Infections",
+                            scaleLabel: {
+                                display: true,
+                                labelString: "Infections"
+                            },
+                            position: "left",
+                            ticks: {
+                                min: 0,
+                                beginAtZero: true
+                            },
+                            gridLines: {
+                                display: false
+                            }
+                        },
+                        {
+                            id: "ADCs",
+                            scaleLabel: {
+                                display: true,
+                                labelString: "ADCs"
+                            },
+                            position: "right",
+                            ticks: {
+                                min: 0,
+                                beginAtZero: true
+                            },
+                            gridLines: {
+                                display: false
+                            }
+                        }
+                    ],
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Week Number"
+                        },
+                        ticks: {
+                            min: 1,
+                            beginAtZero: false
+                        },
+                        gridLines: {
+                            display: false
+                        }
+                    }]
+                },
+                plugins: {
+                    colorschemes: {
+                        scheme: "brewer.SetTwo8"
+                    }
+                }
+            };
+
+            var chart = new Chart(canvas, {
+                options: options,
+                data: data,
+                type: 'line'
+            });
+        };
+
+        function buildShortageChart() {
+            var chartName = "shortageChart";
+            var canvas = document.getElementById(chartName).getContext('2d');
+            var data = {
+                labels: @Html.Raw(xValues),
+                datasets: [
+                    {
+                        label: "Non-ICU Bed Surplus/Shortage",
+                        data: @Html.Raw(nonICUSurplusValues),
+                        fill: false
+                    },
+                    {
+                        label: "ICU Bed Surplus/Shortage",
+                        data: @Html.Raw(icuSurplusValues),
+                        fill: false
+                    },
+                    {
+                        label: "Ventilator Surplus/Shortage",
+                        data: @Html.Raw(ventSurplusValues),
+                        fill: false
+                    }
+                ]
+            };
+            var options = {
+                maintainAspectRatio: false,
+                scales: {
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Beds"
+                        },
+                        ticks: {
+                            beginAtZero: false
+                        },
+                        gridLines: {
+                            display: false
+                        }
+                    }],
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Week Number"
+                        },
+                        ticks: {
+                            min: 1,
+                            beginAtZero: false
+                        },
+                        gridLines: {
+                            display: false
+                        }
+                    }]
+                },
+                plugins: {
+                    colorschemes: {
+                        scheme: "brewer.SetTwo8"
+                    }
+                }
+            };
+
+            var chart = new Chart(canvas, {
+                options: options,
+                data: data,
+                type: 'line'
+            });
+        };
+
+        buildADCChart();
+        buildShortageChart();
+    </script>
+}

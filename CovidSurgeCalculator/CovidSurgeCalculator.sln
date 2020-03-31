@@ -1,0 +1,54 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29920.165
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CovidSurgeCalculator.ModelData", "CovidSurgeCalculator.ModelData\CovidSurgeCalculator.ModelData.csproj", "{C4B9C544-75F7-495B-AB99-0C8E8AFAECE8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CovidSurgeCalculator.ModelData.Tests", "CovidSurgeCalculator.ModelData.Tests\CovidSurgeCalculator.ModelData.Tests.csproj", "{78218E92-3F20-482D-AAD6-C096F94C6AFD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EAB2D24C-E892-46CC-ABE7-9E6444936C64}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CovidSurgeCalculator.ModelData.SerializationHelper", "CovidSurgeCalculator.ModelData.SerializationHelper\CovidSurgeCalculator.ModelData.SerializationHelper.csproj", "{50E0CA79-DE8C-404E-B179-ECB79F625962}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CovidSurgeCalculator.ModelData.ForecastConsole", "CovidSurgeCalculator.ModelData.ForecastConsole\CovidSurgeCalculator.ModelData.ForecastConsole.csproj", "{FE363553-B0A0-4B04-B034-5588E86D56DE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CovidSurgeCalculator.Site", "CovidSurgeCalculator.Site\CovidSurgeCalculator.Site.csproj", "{1EAE3BC1-685A-4AF9-8433-83C74A8EDC51}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C4B9C544-75F7-495B-AB99-0C8E8AFAECE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4B9C544-75F7-495B-AB99-0C8E8AFAECE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4B9C544-75F7-495B-AB99-0C8E8AFAECE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4B9C544-75F7-495B-AB99-0C8E8AFAECE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78218E92-3F20-482D-AAD6-C096F94C6AFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78218E92-3F20-482D-AAD6-C096F94C6AFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78218E92-3F20-482D-AAD6-C096F94C6AFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78218E92-3F20-482D-AAD6-C096F94C6AFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50E0CA79-DE8C-404E-B179-ECB79F625962}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50E0CA79-DE8C-404E-B179-ECB79F625962}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50E0CA79-DE8C-404E-B179-ECB79F625962}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50E0CA79-DE8C-404E-B179-ECB79F625962}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE363553-B0A0-4B04-B034-5588E86D56DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE363553-B0A0-4B04-B034-5588E86D56DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE363553-B0A0-4B04-B034-5588E86D56DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE363553-B0A0-4B04-B034-5588E86D56DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EAE3BC1-685A-4AF9-8433-83C74A8EDC51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EAE3BC1-685A-4AF9-8433-83C74A8EDC51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EAE3BC1-685A-4AF9-8433-83C74A8EDC51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EAE3BC1-685A-4AF9-8433-83C74A8EDC51}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {37623864-1296-4C99-9347-C1CB9763AC02}
+	EndGlobalSection
+EndGlobal

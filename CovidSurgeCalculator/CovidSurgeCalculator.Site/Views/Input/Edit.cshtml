@@ -1,0 +1,150 @@
+﻿@model CalculatorInput
+@{
+    ViewData["Title"] = "Edit Inputs";
+}
+
+@using (Html.BeginForm("Edit", "Input", FormMethod.Post))
+{
+    <fieldset>
+        <div>
+            <p><strong>Demographics</strong></p>
+            @foreach (var demographic in Model.Demographics)
+            {
+                <div class="form-group row">
+                    <label class="col-sm-1 col-form-label">@demographic.Key</label>
+                    <div class="col-sm-1">
+                        <input asp-for="Demographics[demographic.Key]" class="form-control form-control-sm" />
+                    </div>
+                </div>
+            }
+        </div>
+        <div>
+            <p><strong>Hospitalizations</strong></p>
+            <div class="form-group row">
+                <label class="col-sm-5 col-form-label">COVID-19 Hospitalization Rate</label>
+                <div class="col-sm-1">
+                    @Html.EditorFor(m => m.HospitalizationRate, new { htmlAttributes = new { @class = "form-control form-control-sm" } })
+                </div>
+            </div>
+            <p class="text-sm-left text-secondary">
+                Much of the published literature to date on COVID-19 cites a case-based hospitalization rate of 5%.
+                For reference, an estimated COVID-19 hospital admission rate of 5% was cited by Dr. James Lawler, professor, University of Nebraska Medical Center, for the American Hospital Association's (AHA) Coronavirus Update: Webinar Related to Novel Coronavirus (COVID-19), February 26, 2020.<br />
+                A 1.2% hospitalization rate was calculated based on early data out of Italy.<br />
+                This calculator is designed as a scenario modeling tool. It is recommended that multiple surge demand planning scenarios are run to understand and incorporate the broader scope of future demand into your COVID-19 response planning.
+            </p>
+            <div class="form-group row">
+                <label class="col-sm-5 col-form-label">What share of your service area's COVID-19 cases do you assume your hospital will see?</label>
+                <div class="col-sm-1">
+                    @Html.EditorFor(m => m.ServiceAreaHospitalCasePercentage, new { htmlAttributes = new { @class = "form-control form-control-sm" } })
+                </div>
+            </div>
+            <p class="text-sm-left text-secondary">
+                As a suggestion, use of your seasonal medical admissions market share or seasonal pneumonia market share as a starting proxy, with hospitals carrying special designations for bioterrorism, infectious disease epidemics, natural disasters and other related regional responses increasing this rate.<br />
+                For regional market disaster response planning, please set market share to 100% to understand regional demand based on population inputs above.
+            </p>
+        </div>
+        <div>
+            <p><strong>Non-ICU</strong></p>
+            <div class="form-group row">
+                <label class="col-sm-5 col-form-label">Total non-ICU beds</label>
+                <div class="col-sm-1">
+                    @Html.EditorFor(m => m.NonICUBeds.Beds, new { htmlAttributes = new { @class = "form-control form-control-sm" } })
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-5 col-form-label">Current non-ICU bed occupancy rate</label>
+                <div class="col-sm-1">
+                    @Html.EditorFor(m => m.NonICUBeds.CurrentOccupancyRate, new { htmlAttributes = new { @class = "form-control form-control-sm" } })
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-5 col-form-label">Estimated COVID-19 non-ICU ALOS</label>
+                <div class="col-sm-1">
+                    @Html.EditorFor(m => m.NonICUBeds.EstimatedCOVIDALOS, new { htmlAttributes = new { @class = "form-control form-control-sm" } })
+                </div>
+            </div>
+            <p class="text-sm-left text-secondary">
+                For total COVID-19 surge non-ICU capacity shortage/surplus, please enter bed and occupancy reference values related to normal seasonal operations.<br/>
+                To identify post-disaster response planning effort's projected impact, enter non-ICU bed count and occupancy values once altered due to decanting, shell-space addition and other strategies.<br />
+                For regional market disaster response planning, enter either of the above scenarios for pooled market non-ICU bed count and average occupancy.<br />
+                For COVID-19 ALOS reference, current data from the international community cites non-ICU ALOS as 8 days.
+            </p>
+        </div>
+        <div>
+            <p><strong>ICU</strong></p>
+            <div class="form-group row">
+                <label class="col-sm-5 col-form-label">Total ICU beds</label>
+                <div class="col-sm-1">
+                    @Html.EditorFor(m => m.ICUBeds.Beds, new { htmlAttributes = new { @class = "form-control form-control-sm" } })
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-5 col-form-label">Current ICU bed occupancy rate</label>
+                <div class="col-sm-1">
+                    @Html.EditorFor(m => m.ICUBeds.CurrentOccupancyRate, new { htmlAttributes = new { @class = "form-control form-control-sm" } })
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-5 col-form-label">% of hospitalizations that are ICU admissions</label>
+                <div class="col-sm-1">
+                    @Html.EditorFor(m => m.ICUBeds.ICUAdmissionPercentage, new { htmlAttributes = new { @class = "form-control form-control-sm" } })
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-5 col-form-label">Estimated COVID-19 ICU ALOS</label>
+                <div class="col-sm-1">
+                    @Html.EditorFor(m => m.ICUBeds.EstimatedCOVIDALOS, new { htmlAttributes = new { @class = "form-control form-control-sm" } })
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-5 col-form-label">Estimated COVID-19 non-ICU ALOS after ICU stay</label>
+                <div class="col-sm-1">
+                    @Html.EditorFor(m => m.ICUBeds.EstimatedPostICUALOS, new { htmlAttributes = new { @class = "form-control form-control-sm" } })
+                </div>
+            </div>
+            <p class="text-sm-left text-secondary">
+                For total ICU COVID-19 surge capacity shortage/surplus, please enter bed and occupancy reference values related to normal seasonal operations.<br />
+                To identify post-disaster response planning effort's projected impact, enter ICU bed count and occupancy values once altered due to decanting, shell-space addition and other strategies.<br />
+                For regional market disaster response planning, enter either of the above scenarios for pooled market ICU bed count and average occupancy.<br />
+                For COVID-19 ICU ALOS reference, current data from the international community cites critical care cases spend 10 days in ICU and 6 days in non-ICU care. See Methodologies tab for details.
+
+            </p>
+        </div>
+        <div>
+            <p><strong>Ventilators</strong></p>
+            <div class="form-group row">
+                <label class="col-sm-5 col-form-label">Total number of ventilators available</label>
+                <div class="col-sm-1">
+                    @Html.EditorFor(m => m.Ventilators.Total, new { htmlAttributes = new { @class = "form-control form-control-sm" } })
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-5 col-form-label">% ventilators currently in use</label>
+                <div class="col-sm-1">
+                    @Html.EditorFor(m => m.Ventilators.PercentageInUse, new { htmlAttributes = new { @class = "form-control form-control-sm" } })
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-5 col-form-label">% of ICU cases that require ventilator utilization</label>
+                <div class="col-sm-1">
+                    @Html.EditorFor(m => m.Ventilators.EstimatedICUPercentageRequiringVentilation, new { htmlAttributes = new { @class = "form-control form-control-sm" } })
+                </div>
+                
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-5 col-form-label">Estimated days of mechanical ventilation for COVID-19 patients needing mechanical ventilation</label>
+                <div class="col-sm-1">
+                    @Html.EditorFor(m => m.Ventilators.EstimatedICUPatientVentilatorDays, new { htmlAttributes = new { @class = "form-control form-control-sm" } })
+                </div>           
+            </div>
+            <p class="text-sm-left text-secondary">
+                For COVID-19 ventilator days, it is recommended that ventilator days be no more than estimated COVID-19 ICU ALOS days as selected above.
+            </p>
+        </div>
+        <div>
+            <p>
+                <input type="submit" value="Save" />
+            </p>
+        </div>
+    </fieldset>
+}
