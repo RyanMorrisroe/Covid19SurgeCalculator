@@ -2,27 +2,28 @@
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Threading.Tasks;
-using CovidSurgeCalculator.ModelData.Inputs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using CovidSurgeCalculator.ModelData.Inputs;
 
 namespace CovidSurgeCalculator.Site.Controllers
 {
     public class InputController : Controller
     {
         private readonly ILogger<InputController> _logger;
-        private readonly string _inputsPath;
+        private readonly IMemoryCache _memoryCache;
 
-        public InputController(ILogger<InputController> logger)
+        public InputController(ILogger<InputController> logger, IMemoryCache memoryCache)
         {
             _logger = logger;
-            _inputsPath = Path.Combine(Path.Combine(AppDomain.CurrentDomain.GetData("DataDirectory").ToString(), "Binaries"), "Inputs.bin");
+            _memoryCache = memoryCache;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit()
+        public IActionResult Edit()
         {
-            CalculatorInput inputs = await CalculatorInput.ReadBinaryFromDisk(_inputsPath).ConfigureAwait(true);
+            CalculatorInput inputs = (CalculatorInput)_memoryCache.Get("inputs");
             return View(inputs);
         }
 
@@ -33,7 +34,8 @@ namespace CovidSurgeCalculator.Site.Controllers
 
             if(ModelState.IsValid)
             {
-                await inputs.WriteBinaryToDisk(_inputsPath).ConfigureAwait(true);
+                _memoryCache.Set("inputs", inputs, new MemoryCacheEntryOptions() { Priority = CacheItemPriority.NeverRemove });
+                await inputs.WriteBinaryToDisk(Path.Combine(Path.Combine(AppDomain.CurrentDomain.GetData("DataDirectory").ToString(), "Binaries"), "Inputs.bin")).ConfigureAwait(true);
             }
             return RedirectToAction("Index", "Home");
         }

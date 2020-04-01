@@ -2,11 +2,10 @@
 using System.Diagnostics.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Caching.Memory;
 using CovidSurgeCalculator.ModelData.Inputs;
 using CovidSurgeCalculator.ModelData.ReferenceData;
 using CovidSurgeCalculator.Site.Models;
-using System.IO;
-using System;
 
 namespace CovidSurgeCalculator.Site.Controllers
 {
@@ -16,13 +15,12 @@ namespace CovidSurgeCalculator.Site.Controllers
         private readonly CalculatorInput _inputs;
         private readonly ReferenceInfectionModel _infectionModel;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IMemoryCache memoryCache)
         {
             _logger = logger;
 
-            string binaryPath = Path.Combine(AppDomain.CurrentDomain.GetData("DataDirectory").ToString(), "Binaries");
-            _inputs = CalculatorInput.ReadBinaryFromDisk(Path.Combine(binaryPath, "Inputs.bin")).Result;
-            _infectionModel = ReferenceInfectionModel.ReadBinaryFromDisk(Path.Combine(binaryPath, "ReferenceInfectionModel.bin"), _inputs).Result;
+            _inputs = (CalculatorInput)memoryCache.Get("inputs");
+            _infectionModel = (ReferenceInfectionModel)memoryCache.Get("infectionModel");
         }
 
         [HttpGet]
