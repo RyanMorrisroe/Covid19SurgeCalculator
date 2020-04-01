@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using CovidSurgeCalculator.ModelData.Inputs;
+using CovidSurgeCalculator.ModelData.ReferenceData;
 
 namespace CovidSurgeCalculator.Site.Controllers
 {
@@ -58,6 +59,9 @@ namespace CovidSurgeCalculator.Site.Controllers
                     _memoryCache.Set("inputs", inputs, new MemoryCacheEntryOptions() { Priority = CacheItemPriority.NeverRemove });
                     await inputs.WriteBinaryToDisk(Path.Combine(Path.Combine(AppDomain.CurrentDomain.GetData("DataDirectory").ToString(), "Binaries"), "Inputs.bin")).ConfigureAwait(true);
                 }
+                ReferenceInfectionModel infectionModel = (ReferenceInfectionModel)_memoryCache.Get("infectionModel");
+                infectionModel.ApplyCalculatorInputToAgeCohortInformation(inputs);
+                _memoryCache.Set("infectionModel", infectionModel);
             }
             return RedirectToAction("Index", "Home");
         }
