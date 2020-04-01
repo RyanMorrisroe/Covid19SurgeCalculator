@@ -32,7 +32,7 @@ namespace CovidSurgeCalculator.ModelData.ForecastConsole
         {
             CalculatorInput inputs = new CalculatorInput(demographics);
             ReferenceInfectionModel referenceModel = ReferenceInfectionModel.ReadBinaryFromDisk(args.ReferenceBinaryPath, inputs).Result;
-            FullForecast forecast = new FullForecast(inputs, referenceModel);
+            FullForecast _ = new FullForecast(inputs, referenceModel);
             return 0;
         }
 

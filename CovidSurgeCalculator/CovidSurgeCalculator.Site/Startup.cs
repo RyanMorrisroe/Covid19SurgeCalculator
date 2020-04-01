@@ -80,7 +80,15 @@ namespace CovidSurgeCalculator.Site
         private async Task LoadCache(ILogger<Startup> logger, IMemoryCache memoryCache, string dataDirectory)
         {
             string binaryPath = Path.Combine(dataDirectory, "Binaries");
-            CalculatorInput inputs = await CalculatorInput.ReadBinaryFromDisk(Path.Combine(binaryPath, "Inputs.bin")).ConfigureAwait(true);
+            CalculatorInput inputs;
+            if(UseSession)
+            {
+                inputs = await CalculatorInput.ReadBinaryFromDisk(Path.Combine(binaryPath, "DefaultInputs.bin")).ConfigureAwait(true);
+            }
+            else
+            {
+                inputs = await CalculatorInput.ReadBinaryFromDisk(Path.Combine(binaryPath, "Inputs.bin")).ConfigureAwait(true);
+            }
             logger.LogInformation("Inputs read from disk");
             ReferenceInfectionModel infectionModel = await ReferenceInfectionModel.ReadBinaryFromDisk(Path.Combine(binaryPath, "ReferenceInfectionModel.bin"), inputs).ConfigureAwait(true);
             logger.LogInformation("Infection Model read from disk");

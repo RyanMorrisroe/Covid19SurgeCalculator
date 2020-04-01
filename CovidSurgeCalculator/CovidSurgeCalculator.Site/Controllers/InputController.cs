@@ -34,10 +34,12 @@ namespace CovidSurgeCalculator.Site.Controllers
             CalculatorInput inputs;
             if(_useSession)
             {
+                _logger.LogInformation("Pulling inputs from session");
                 inputs = JsonConvert.DeserializeObject<CalculatorInput>(HttpContext.Session.GetString("inputs"));
             }
             else
             {
+                _logger.LogInformation("Pulling inputs from memory cache");
                 inputs = (CalculatorInput)_memoryCache.Get("inputs");
             }    
             return View(inputs);
@@ -53,15 +55,21 @@ namespace CovidSurgeCalculator.Site.Controllers
                 if(_useSession)
                 {
                     HttpContext.Session.SetString("inputs", JsonConvert.SerializeObject(inputs));
+                    _logger.LogInformation("Wrote inputs to session");
                 }
                 else
                 {
                     _memoryCache.Set("inputs", inputs, new MemoryCacheEntryOptions() { Priority = CacheItemPriority.NeverRemove });
+                    _logger.LogInformation("Wrote inputs to memory cache");
                     await inputs.WriteBinaryToDisk(Path.Combine(Path.Combine(AppDomain.CurrentDomain.GetData("DataDirectory").ToString(), "Binaries"), "Inputs.bin")).ConfigureAwait(true);
+                    _logger.LogInformation("Wrote inputs to disk");
                 }
                 ReferenceInfectionModel infectionModel = (ReferenceInfectionModel)_memoryCache.Get("infectionModel");
+                _logger.LogInformation("Pulled infection model from memory cache");
                 infectionModel.ApplyCalculatorInputToAgeCohortInformation(inputs);
+                _logger.LogInformation("Reapplied inputs to infection model");
                 _memoryCache.Set("infectionModel", infectionModel);
+                _logger.LogInformation("Stored infection model in memory cache");
             }
             return RedirectToAction("Index", "Home");
         }

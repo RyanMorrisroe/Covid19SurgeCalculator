@@ -28,6 +28,7 @@ namespace CovidSurgeCalculator.Site.Controllers
             _logger = logger;
             _memoryCache = memoryCache;
             _useSession = bool.Parse(configuration["UseSession"]);
+            _logger.LogInformation("Retriving infection model from cache");
             _infectionModel = (ReferenceInfectionModel)memoryCache.Get("infectionModel");
         }
 
@@ -37,17 +38,22 @@ namespace CovidSurgeCalculator.Site.Controllers
             {
                 if (!context.Session.TryGetValue("inputs", out _))
                 {
+                    _logger.LogInformation("Inputs not found in session, retrieving defaults from disk");
                     CalculatorInput inputs = CalculatorInput.ReadBinaryFromDisk(Path.Combine(Path.Combine(AppDomain.CurrentDomain.GetData("DataDirectory").ToString(), "Binaries"), "DefaultInputs.bin")).Result;
+                    _logger.LogInformation("Default inputs read from disk");
                     context.Session.SetString("inputs", JsonConvert.SerializeObject(inputs));
+                    _logger.LogInformation("Default inputs stored in session");
                     return inputs;
                 }
                 else
                 {
+                    _logger.LogInformation("Inputs found in session");
                     return JsonConvert.DeserializeObject<CalculatorInput>(context.Session.GetString("inputs"));
                 }
             }
             else
             {
+                _logger.LogInformation("Retrieving inputs from cache");
                 return (CalculatorInput)_memoryCache.Get("inputs");
             }
         }
@@ -56,7 +62,9 @@ namespace CovidSurgeCalculator.Site.Controllers
         public IActionResult WeeklyData()
         {
             ForecastModel forecast = new ForecastModel(GetInputs(HttpContext), _infectionModel);
+            _logger.LogInformation("Built new weekly forecast");
             forecast.GridData = forecast.BuildGridDataFromWeeks(HttpContext, Request);
+            _logger.LogInformation("Built grid from weekly forecast");
             return View(forecast);
         }
 
@@ -69,7 +77,9 @@ namespace CovidSurgeCalculator.Site.Controllers
             {
                 SelectedForecast = modifiedForecast.SelectedForecast
             };
+            _logger.LogInformation("Built new weekly forecast from existing");
             forecast.GridData = forecast.BuildGridDataFromWeeks(HttpContext, Request);
+            _logger.LogInformation("Built grid from new weekly forecast");
             return forecast.GridExport();
         }
 
@@ -82,7 +92,9 @@ namespace CovidSurgeCalculator.Site.Controllers
             {
                 SelectedForecast = modifiedForecast.SelectedForecast
             };
+            _logger.LogInformation("Built new weekly forecast from existing");
             forecast.GridData = forecast.BuildGridDataFromWeeks(HttpContext, Request);
+            _logger.LogInformation("Built grid from new weekly forecast");
             return View(forecast);
         }
 
@@ -90,7 +102,9 @@ namespace CovidSurgeCalculator.Site.Controllers
         public IActionResult DailyData()
         {
             ForecastModel forecast = new ForecastModel(GetInputs(HttpContext), _infectionModel);
+            _logger.LogInformation("Built new daily forecast");
             forecast.GridData = forecast.BuildGridDataFromDays(HttpContext, Request);
+            _logger.LogInformation("Built grid from daily forecast");
             return View(forecast);
         }
 
@@ -103,7 +117,9 @@ namespace CovidSurgeCalculator.Site.Controllers
             {
                 SelectedForecast = modifiedForecast.SelectedForecast
             };
+            _logger.LogInformation("Built new daily forecast from existing");
             forecast.GridData = forecast.BuildGridDataFromDays(HttpContext, Request);
+            _logger.LogInformation("Built grid from new daily forecast");
             return forecast.GridExport();
         }
 
@@ -116,7 +132,9 @@ namespace CovidSurgeCalculator.Site.Controllers
             {
                 SelectedForecast = modifiedForecast.SelectedForecast
             };
+            _logger.LogInformation("Built new daily forecast from existing");
             forecast.GridData = forecast.BuildGridDataFromDays(HttpContext, Request);
+            _logger.LogInformation("Built grid from new daily forecast");
             return View(forecast);
         }
 
@@ -124,7 +142,7 @@ namespace CovidSurgeCalculator.Site.Controllers
         public IActionResult Index()
         {
             ForecastModel forecast = new ForecastModel(GetInputs(HttpContext), _infectionModel);
-            forecast.GridData = forecast.BuildGridDataFromWeeks(HttpContext, Request);
+            _logger.LogInformation("Built new weekly forecast");
             return View(forecast);
         }
 
@@ -132,7 +150,7 @@ namespace CovidSurgeCalculator.Site.Controllers
         public IActionResult DailySurgeComparison()
         {
             ForecastModel forecast = new ForecastModel(GetInputs(HttpContext), _infectionModel);
-            forecast.GridData = forecast.BuildGridDataFromWeeks(HttpContext, Request);
+            _logger.LogInformation("Built new daily forecast");
             return View(forecast);
         }
 
