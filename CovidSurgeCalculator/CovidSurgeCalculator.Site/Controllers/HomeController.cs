@@ -37,7 +37,7 @@ namespace CovidSurgeCalculator.Site.Controllers
             {
                 if (!context.Session.TryGetValue("inputs", out _))
                 {
-                    CalculatorInput inputs = CalculatorInput.ReadBinaryFromDisk(Path.Combine(Path.Combine(AppDomain.CurrentDomain.GetData("DataDirectory").ToString(), "Binaries"), "Inputs.bin")).Result;
+                    CalculatorInput inputs = CalculatorInput.ReadBinaryFromDisk(Path.Combine(Path.Combine(AppDomain.CurrentDomain.GetData("DataDirectory").ToString(), "Binaries"), "DefaultInputs.bin")).Result;
                     context.Session.SetString("inputs", JsonConvert.SerializeObject(inputs));
                     return inputs;
                 }
