@@ -29,6 +29,18 @@
     <ProjectReference Include="..\CovidSurgeCalculator.ModelData\CovidSurgeCalculator.ModelData.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="App_Data\Binaries\DefaultInputs.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="App_Data\Binaries\Inputs.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="App_Data\Binaries\ReferenceInfectionModel.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 
 
 </Project>
