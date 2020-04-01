@@ -13,7 +13,7 @@ namespace CovidSurgeCalculator.Site.Models
 {
     public class ForecastModel : FullForecast
     {
-        public string SelectedForecast { get; set; } = "Sample Mitigation";
+        public string SelectedForecast { get; set; } = "Mild Social Distancing";
         public List<string> ForecastNames { get; private set; } = new List<string>() { "Sample Mitigation", "Moderate Social Distancing", "Mild Social Distancing", "Early Pandemic" };
         public IGrid<IForecastReport> GridData { get; set; }
 
@@ -43,7 +43,7 @@ namespace CovidSurgeCalculator.Site.Models
 
                 return new FileContentResult(package.GetAsByteArray(), "application/unknown")
                 {
-                    FileDownloadName = "{SelectedForecast}Export.xlsx"
+                    FileDownloadName = $"{SelectedForecast} Export.xlsx"
                 };
             }
         }
