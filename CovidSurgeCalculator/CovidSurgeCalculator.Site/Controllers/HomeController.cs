@@ -1,8 +1,13 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using System.IO;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Memory;
+using Newtonsoft.Json;
 using CovidSurgeCalculator.ModelData.Inputs;
 using CovidSurgeCalculator.ModelData.ReferenceData;
 using CovidSurgeCalculator.Site.Models;
@@ -12,21 +17,45 @@ namespace CovidSurgeCalculator.Site.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly CalculatorInput _inputs;
+        private readonly IMemoryCache _memoryCache;
         private readonly ReferenceInfectionModel _infectionModel;
+        private readonly bool _useSession;
 
-        public HomeController(ILogger<HomeController> logger, IMemoryCache memoryCache)
+        public HomeController(ILogger<HomeController> logger, IMemoryCache memoryCache, IConfiguration configuration)
         {
-            _logger = logger;
+            Contract.Requires(configuration != null);
 
-            _inputs = (CalculatorInput)memoryCache.Get("inputs");
+            _logger = logger;
+            _memoryCache = memoryCache;
+            _useSession = bool.Parse(configuration["UseSession"]);
             _infectionModel = (ReferenceInfectionModel)memoryCache.Get("infectionModel");
+        }
+
+        private CalculatorInput GetInputs(HttpContext context)
+        {
+            if (_useSession)
+            {
+                if (!context.Session.TryGetValue("inputs", out _))
+                {
+                    CalculatorInput inputs = CalculatorInput.ReadBinaryFromDisk(Path.Combine(Path.Combine(AppDomain.CurrentDomain.GetData("DataDirectory").ToString(), "Binaries"), "Inputs.bin")).Result;
+                    context.Session.SetString("inputs", JsonConvert.SerializeObject(inputs));
+                    return inputs;
+                }
+                else
+                {
+                    return JsonConvert.DeserializeObject<CalculatorInput>(context.Session.GetString("inputs"));
+                }
+            }
+            else
+            {
+                return (CalculatorInput)_memoryCache.Get("inputs");
+            }
         }
 
         [HttpGet]
         public IActionResult WeeklyData()
         {
-            ForecastModel forecast = new ForecastModel(_inputs, _infectionModel);
+            ForecastModel forecast = new ForecastModel(GetInputs(HttpContext), _infectionModel);
             forecast.GridData = forecast.BuildGridDataFromWeeks(HttpContext, Request);
             return View(forecast);
         }
@@ -36,7 +65,7 @@ namespace CovidSurgeCalculator.Site.Controllers
         {
             Contract.Requires(modifiedForecast != null);
 
-            ForecastModel forecast = new ForecastModel(_inputs, _infectionModel)
+            ForecastModel forecast = new ForecastModel(GetInputs(HttpContext), _infectionModel)
             {
                 SelectedForecast = modifiedForecast.SelectedForecast
             };
@@ -49,7 +78,7 @@ namespace CovidSurgeCalculator.Site.Controllers
         {
             Contract.Requires(modifiedForecast != null);
 
-            ForecastModel forecast = new ForecastModel(_inputs, _infectionModel)
+            ForecastModel forecast = new ForecastModel(GetInputs(HttpContext), _infectionModel)
             {
                 SelectedForecast = modifiedForecast.SelectedForecast
             };
@@ -60,7 +89,7 @@ namespace CovidSurgeCalculator.Site.Controllers
         [HttpGet]
         public IActionResult DailyData()
         {
-            ForecastModel forecast = new ForecastModel(_inputs, _infectionModel);
+            ForecastModel forecast = new ForecastModel(GetInputs(HttpContext), _infectionModel);
             forecast.GridData = forecast.BuildGridDataFromDays(HttpContext, Request);
             return View(forecast);
         }
@@ -70,7 +99,7 @@ namespace CovidSurgeCalculator.Site.Controllers
         {
             Contract.Requires(modifiedForecast != null);
 
-            ForecastModel forecast = new ForecastModel(_inputs, _infectionModel)
+            ForecastModel forecast = new ForecastModel(GetInputs(HttpContext), _infectionModel)
             {
                 SelectedForecast = modifiedForecast.SelectedForecast
             };
@@ -83,7 +112,7 @@ namespace CovidSurgeCalculator.Site.Controllers
         {
             Contract.Requires(modifiedForecast != null);
 
-            ForecastModel forecast = new ForecastModel(_inputs, _infectionModel)
+            ForecastModel forecast = new ForecastModel(GetInputs(HttpContext), _infectionModel)
             {
                 SelectedForecast = modifiedForecast.SelectedForecast
             };
@@ -94,7 +123,7 @@ namespace CovidSurgeCalculator.Site.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            ForecastModel forecast = new ForecastModel(_inputs, _infectionModel);
+            ForecastModel forecast = new ForecastModel(GetInputs(HttpContext), _infectionModel);
             forecast.GridData = forecast.BuildGridDataFromWeeks(HttpContext, Request);
             return View(forecast);
         }
@@ -102,7 +131,7 @@ namespace CovidSurgeCalculator.Site.Controllers
         [HttpGet]
         public IActionResult DailySurgeComparison()
         {
-            ForecastModel forecast = new ForecastModel(_inputs, _infectionModel);
+            ForecastModel forecast = new ForecastModel(GetInputs(HttpContext), _infectionModel);
             forecast.GridData = forecast.BuildGridDataFromWeeks(HttpContext, Request);
             return View(forecast);
         }

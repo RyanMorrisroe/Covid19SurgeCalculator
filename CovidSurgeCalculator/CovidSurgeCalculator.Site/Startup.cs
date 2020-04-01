@@ -18,18 +18,31 @@ namespace CovidSurgeCalculator.Site
     {
         public Startup(IConfiguration configuration)
         {
+            Contract.Requires(configuration != null);
+
             Configuration = configuration;
+            UseSession = bool.Parse(configuration["UseSession"]);
         }
 
         public IConfiguration Configuration { get; }
+        public bool UseSession { get; }
 
-        public static void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
             services.AddMemoryCache();
+            if (UseSession)
+            {
+                services.AddDistributedMemoryCache();
+                services.AddSession(options =>
+                {
+                    options.Cookie.Name = ".CovidSurgeCalculator.Session";
+                    options.Cookie.IsEssential = true;
+                });
+            }
         }
 
-        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger, IMemoryCache memoryCache)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger, IMemoryCache memoryCache)
         {
             Contract.Requires(env != null);
             Contract.Requires(memoryCache != null);
@@ -49,6 +62,10 @@ namespace CovidSurgeCalculator.Site
             app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthorization();
+            if (UseSession)
+            {
+                app.UseSession();
+            }
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
@@ -60,7 +77,7 @@ namespace CovidSurgeCalculator.Site
             LoadCache(logger, memoryCache, dataDirectory).Wait();
         }
 
-        private static async Task LoadCache(ILogger<Startup> logger, IMemoryCache memoryCache, string dataDirectory)
+        private async Task LoadCache(ILogger<Startup> logger, IMemoryCache memoryCache, string dataDirectory)
         {
             string binaryPath = Path.Combine(dataDirectory, "Binaries");
             CalculatorInput inputs = await CalculatorInput.ReadBinaryFromDisk(Path.Combine(binaryPath, "Inputs.bin")).ConfigureAwait(true);
@@ -73,10 +90,13 @@ namespace CovidSurgeCalculator.Site
                 Priority = CacheItemPriority.NeverRemove
             };
 
-            if (!memoryCache.TryGetValue("inputs", out _))
+            if (!UseSession)
             {
-                memoryCache.Set("inputs", inputs, cacheOptions);
-                logger.LogInformation("Added inputs to cache");
+                if (!memoryCache.TryGetValue("inputs", out _))
+                {
+                    memoryCache.Set("inputs", inputs, cacheOptions);
+                    logger.LogInformation("Added inputs to cache");
+                }
             }
             if (!memoryCache.TryGetValue("infectionModel", out _))
             {

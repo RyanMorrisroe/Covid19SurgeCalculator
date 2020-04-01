@@ -2,9 +2,12 @@
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using CovidSurgeCalculator.ModelData.Inputs;
 
 namespace CovidSurgeCalculator.Site.Controllers
@@ -13,17 +16,29 @@ namespace CovidSurgeCalculator.Site.Controllers
     {
         private readonly ILogger<InputController> _logger;
         private readonly IMemoryCache _memoryCache;
+        private readonly bool _useSession;
 
-        public InputController(ILogger<InputController> logger, IMemoryCache memoryCache)
+        public InputController(ILogger<InputController> logger, IMemoryCache memoryCache, IConfiguration configuration)
         {
+            Contract.Requires(configuration != null);
+
             _logger = logger;
             _memoryCache = memoryCache;
+            _useSession = bool.Parse(configuration["UseSession"]);
         }
 
         [HttpGet]
         public IActionResult Edit()
         {
-            CalculatorInput inputs = (CalculatorInput)_memoryCache.Get("inputs");
+            CalculatorInput inputs;
+            if(_useSession)
+            {
+                inputs = JsonConvert.DeserializeObject<CalculatorInput>(HttpContext.Session.GetString("inputs"));
+            }
+            else
+            {
+                inputs = (CalculatorInput)_memoryCache.Get("inputs");
+            }    
             return View(inputs);
         }
 
@@ -34,8 +49,15 @@ namespace CovidSurgeCalculator.Site.Controllers
 
             if(ModelState.IsValid)
             {
-                _memoryCache.Set("inputs", inputs, new MemoryCacheEntryOptions() { Priority = CacheItemPriority.NeverRemove });
-                await inputs.WriteBinaryToDisk(Path.Combine(Path.Combine(AppDomain.CurrentDomain.GetData("DataDirectory").ToString(), "Binaries"), "Inputs.bin")).ConfigureAwait(true);
+                if(_useSession)
+                {
+                    HttpContext.Session.SetString("inputs", JsonConvert.SerializeObject(inputs));
+                }
+                else
+                {
+                    _memoryCache.Set("inputs", inputs, new MemoryCacheEntryOptions() { Priority = CacheItemPriority.NeverRemove });
+                    await inputs.WriteBinaryToDisk(Path.Combine(Path.Combine(AppDomain.CurrentDomain.GetData("DataDirectory").ToString(), "Binaries"), "Inputs.bin")).ConfigureAwait(true);
+                }
             }
             return RedirectToAction("Index", "Home");
         }
