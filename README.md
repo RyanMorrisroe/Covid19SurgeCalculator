@@ -3,6 +3,8 @@
 
 A web-based COVID-19 Surge Calculator based off the Sg2 beta v2 COVID-19 Surge Calculator.
 
+**Important Note**: Although this codebase is licensed under the MIT license, which allows for free commercial use, it includes EPPlus 5.0.4 to generate Excel Exports. That software requires a paid license for commercial use. However, public safety or health organizations appear to be exempt from this requirement - please review https://epplussoftware.com/LicenseOverview/LicenseFAQ if you plan on using this code commercially. I believe you could downgrade to EPPlus 4 (does not require commercial licensing) with little effort, but I have not tested doing so. You could also swap to another Excel file generator.
+
 ## Building
 1.) Clone the repo locally
 
