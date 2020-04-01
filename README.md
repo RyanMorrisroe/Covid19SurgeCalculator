@@ -13,7 +13,7 @@ A web-based COVID-19 Surge Calculator based off the Sg2 beta v2 COVID-19 Surge C
 4.) Start CovidSurgeCalculator.Site to view locally
 
 ## Deployment
-Follow standard deployment practices for an ASP.NET Core 3.1 website. Should theoretically run on Linux but has only been tested on Windows hosts. Uses SSL so be sure to supply a valid certificate.
+Follow standard deployment practices for an ASP.NET Core 3.1 website. Works on Windows or Linux. Uses SSL so be sure to supply a valid certificate. Can see a working deployment at https://covidsurgecalculator.azurewebsites.net/
 
 ## Configuration
 Use the "UseSession" boolean in appsettings.json to determine the behavior of the site.
