@@ -1,7 +1,7 @@
 # COVID-19 Surge Calculator
 **This tool is provided as open source software, free of charge, and with no warranty. The author makes no claim to the accuracy of results - if you choose to employ this tool you should verify the output with other modeling tools.**
 
-A web-based COVID-19 Surge Calculator based off the Sg2 beta v2 Surge Calculator.
+A web-based COVID-19 Surge Calculator based off the Sg2 beta v2 COVID-19 Surge Calculator.
 
 ## Building
 1.) Clone the repo locally
