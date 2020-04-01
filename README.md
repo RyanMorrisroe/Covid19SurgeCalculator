@@ -35,6 +35,6 @@ All forecasting logic is found in CovidSurgeCalculator.ModelData, unit tests are
 
 Raw infection model curve and age cohort data is found in the CSVs folder in CovidSurgeCalculator.ModelData.SerializationHelper. 
 
-Run SerializationHelper to regenerate the default model inputs binary and the Reference Infection Model binary. 
+Run SerializationHelper to regenerate the default model inputs binary and the Reference Infection Model binary if alterations are made to the raw csv files. 
 
 If new binaries are generated, they should be placed in App_Data\Binaries\ in CovidSurgeCalculator.Site.
