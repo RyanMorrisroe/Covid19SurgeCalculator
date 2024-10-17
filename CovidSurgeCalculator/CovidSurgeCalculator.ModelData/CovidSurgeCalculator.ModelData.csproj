@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="15.0.3" />
-    <PackageReference Include="MessagePack" Version="2.1.90" />
+    <PackageReference Include="MessagePack" Version="2.5.187" />
     <PackageReference Include="MessagePackAnalyzer" Version="2.1.90" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
       <PrivateAssets>all</PrivateAssets>
