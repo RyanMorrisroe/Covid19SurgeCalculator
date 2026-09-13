@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CovidSurgeCalculator.ModelData.Inputs;
 using CsvHelper;
+using CsvHelper.Configuration;
 using MessagePack;
 
 namespace CovidSurgeCalculator.ModelData.ReferenceData
@@ -87,10 +88,13 @@ namespace CovidSurgeCalculator.ModelData.ReferenceData
             List<AgeCohort> ageCohorts;
             using (StreamReader reader = new StreamReader(path))
             {
-                using (CsvReader csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                CsvConfiguration configuration = new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
-                    csv.Configuration.HeaderValidated = null;
-                    csv.Configuration.MissingFieldFound = null;
+                    HeaderValidated = null,
+                    MissingFieldFound = null
+                };
+                using (CsvReader csv = new CsvReader(reader, configuration))
+                {
                     ageCohorts = csv.GetRecords<AgeCohort>().ToList();
                 }
             }

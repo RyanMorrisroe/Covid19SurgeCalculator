@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
-using System.IO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -38,9 +37,8 @@ namespace CovidSurgeCalculator.Site.Controllers
             {
                 if (!context.Session.TryGetValue("inputs", out _))
                 {
-                    _logger.LogInformation("Inputs not found in session, retrieving defaults from disk");
-                    CalculatorInput inputs = CalculatorInput.ReadBinaryFromDisk(Path.Combine(Path.Combine(AppDomain.CurrentDomain.GetData("DataDirectory").ToString(), "Binaries"), "DefaultInputs.bin")).Result;
-                    _logger.LogInformation("Default inputs read from disk");
+                    _logger.LogInformation("Inputs not found in session, retrieving defaults from cache");
+                    CalculatorInput inputs = (CalculatorInput)_memoryCache.Get("defaultInputs");
                     context.Session.SetString("inputs", JsonConvert.SerializeObject(inputs));
                     _logger.LogInformation("Default inputs stored in session");
                     return inputs;

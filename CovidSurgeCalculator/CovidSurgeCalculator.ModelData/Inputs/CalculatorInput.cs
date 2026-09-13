@@ -8,7 +8,7 @@ using MessagePack;
 namespace CovidSurgeCalculator.ModelData.Inputs
 {
     [MessagePackObject(true)]
-    public class CalculatorInput
+    public partial class CalculatorInput
     {
         public Dictionary<string, int> Demographics { get; private set; } = new Dictionary<string, int>();
         public int TotalPopulation

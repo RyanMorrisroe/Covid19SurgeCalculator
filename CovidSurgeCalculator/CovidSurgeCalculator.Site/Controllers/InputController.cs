@@ -3,6 +3,7 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -18,14 +19,16 @@ namespace CovidSurgeCalculator.Site.Controllers
         private readonly ILogger<InputController> _logger;
         private readonly IMemoryCache _memoryCache;
         private readonly bool _useSession;
+        private readonly IWebHostEnvironment _environment;
 
-        public InputController(ILogger<InputController> logger, IMemoryCache memoryCache, IConfiguration configuration)
+        public InputController(ILogger<InputController> logger, IMemoryCache memoryCache, IConfiguration configuration, IWebHostEnvironment environment)
         {
             Contract.Requires(configuration != null);
 
             _logger = logger;
             _memoryCache = memoryCache;
             _useSession = bool.Parse(configuration["UseSession"]);
+            _environment = environment;
         }
 
         [HttpGet]
@@ -61,7 +64,8 @@ namespace CovidSurgeCalculator.Site.Controllers
                 {
                     _memoryCache.Set("inputs", inputs, new MemoryCacheEntryOptions() { Priority = CacheItemPriority.NeverRemove });
                     _logger.LogInformation("Wrote inputs to memory cache");
-                    await inputs.WriteBinaryToDisk(Path.Combine(Path.Combine(AppDomain.CurrentDomain.GetData("DataDirectory").ToString(), "Binaries"), "Inputs.bin")).ConfigureAwait(true);
+                    string binaryPath = Path.Combine(_environment.ContentRootPath, "App_Data", "Binaries", "Inputs.bin");
+                    await inputs.WriteBinaryToDisk(binaryPath).ConfigureAwait(false);
                     _logger.LogInformation("Wrote inputs to disk");
                 }
                 ReferenceInfectionModel infectionModel = (ReferenceInfectionModel)_memoryCache.Get("infectionModel");

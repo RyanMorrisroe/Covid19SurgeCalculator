@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NonFactors.Mvc.Grid;
-using OfficeOpenXml;
+using ClosedXML.Excel;
+using System.IO;
 
 namespace CovidSurgeCalculator.Site.Models
 {
@@ -20,15 +21,15 @@ namespace CovidSurgeCalculator.Site.Models
         public FileContentResult GridExport()
         {
             int col = 1;
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            using (ExcelPackage package = new ExcelPackage())
+            using (XLWorkbook workbook = new XLWorkbook())
             {
-                ExcelWorksheet sheet = package.Workbook.Worksheets.Add("Data");
+                IXLWorksheet sheet = workbook.Worksheets.Add("Data");
 
                 foreach (IGridColumn column in GridData.Columns)
                 {
-                    sheet.Cells[1, col].Value = column.Title;
-                    sheet.Column(col++).Width = 18;
+                    sheet.Cell(1, col).Value = column.Title?.ToString();
+                    sheet.Column(col).Width = 18;
+                    col++;
                     column.IsEncoded = false;
                 }
 
@@ -37,14 +38,19 @@ namespace CovidSurgeCalculator.Site.Models
                     col = 1;
                     foreach (IGridColumn column in GridData.Columns)
                     {
-                        sheet.Cells[row.Index + 2, col++].Value = column.ValueFor(row);
+                        sheet.Cell(row.Index + 2, col).Value = column.ValueFor(row)?.ToString();
+                        col++;
                     }
                 }
 
-                return new FileContentResult(package.GetAsByteArray(), "application/unknown")
+                using (MemoryStream stream = new MemoryStream())
                 {
-                    FileDownloadName = $"{SelectedForecast} Export.xlsx"
-                };
+                    workbook.SaveAs(stream);
+                    return new FileContentResult(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                    {
+                        FileDownloadName = $"{SelectedForecast} Export.xlsx"
+                    };
+                }
             }
         }
 
@@ -71,7 +77,7 @@ namespace CovidSurgeCalculator.Site.Models
 
             IGrid<IForecastReport> grid = new Grid<IForecastReport>(weeks)
             {
-                ViewContext = new ViewContext { HttpContext = httpContext },
+                HttpContext = httpContext,
                 Query = request.Query
             };
 
@@ -109,7 +115,7 @@ namespace CovidSurgeCalculator.Site.Models
 
             IGrid<IForecastReport> grid = new Grid<IForecastReport>(days)
             {
-                ViewContext = new ViewContext { HttpContext = httpContext },
+                HttpContext = httpContext,
                 Query = request.Query
             };
 
